@@ -87,4 +87,20 @@ public class TVController {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(tvShow);
     }
 
+    @RequestMapping(value = "/unSelectWatchedTv", method = RequestMethod.POST)
+    public ResponseEntity unSelectWatchedTv(@RequestParam String email,
+                                            @RequestParam String password,
+                                            @RequestParam String tvShowName) {
+
+        User user = userService.findUser(email, password);
+        if ( Objects.isNull(user) || Strings.isBlank(tvShowName)) {
+            throw new TvShowNotFoundException(tvShowName);
+        }
+        TvShow tvShow = tmdbApi.findTvShow(tvShowName);
+        if (Objects.nonNull(tvShow)){
+            userService.unSelectTvShowWatched(user, tvShow);
+        }
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(tvShowName);
+    }
+
 }

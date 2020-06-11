@@ -10,5 +10,6 @@ public interface UserService {
     User addFavoriteActor(User user, Person person);
     User removeFavoriteActor(User user, String fullName);
     User addTvShowWatched(User user, TvShow tvShow);
+    User unSelectTvShowWatched(User user, TvShow tvShow);
 }
 
