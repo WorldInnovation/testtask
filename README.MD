@@ -14,3 +14,5 @@ curl -X POST --data "email=test@test2.com&password=test&name=Jennifer&lastName=C
 curl -X POST --data "email=test@test2.com&password=test&tvShowName=snowpiercer" http://localhost:8080/tv/addWatchedTv/ -u user:password
 9. Remove watched Tv show
 curl -X POST --data "email=test@test2.com&password=test&tvShowName=snowpiercer" http://localhost:8080/tv/unSelectWatchedTv/ -u user:password
+10. 
+curl -X GET --data "email=test@test2.com&password=test" http://localhost:8080/tv/tvFavoriteActorUnwatched/ -u user:password

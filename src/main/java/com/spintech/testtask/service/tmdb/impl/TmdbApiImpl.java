@@ -2,8 +2,10 @@ package com.spintech.testtask.service.tmdb.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spintech.testtask.entity.ActorWithTvShows;
 import com.spintech.testtask.entity.Person;
 import com.spintech.testtask.entity.TvShow;
+import com.spintech.testtask.entity.User;
 import com.spintech.testtask.service.tmdb.TmdbApi;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.utils.URIBuilder;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URISyntaxException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -84,6 +88,43 @@ public class TmdbApiImpl implements TmdbApi {
         }
 
         return null;
+    }
+
+    @Override
+    public List<TvShow> finedTvFavoriteActorUnwatched(User user) {
+        Set<TvShow> tvShows = new HashSet<>();
+        HashMap<String, Integer> favoriteActorsMap = new HashMap<>(user.getFavoriteActors());
+        for (HashMap.Entry<String, Integer> favoritActor  : favoriteActorsMap.entrySet()
+                ) {
+            try {
+                String personSelectId = tmdbPerson + "/" + favoritActor.getValue() + "/tv_credits";
+                String url = getTmdbUrl(personSelectId);
+                RestTemplate restTemplate = new RestTemplate();
+                ResponseEntity<String> response
+                        = restTemplate.getForEntity(url, String.class);
+
+                if (!response.getStatusCode().is2xxSuccessful()) {
+                    return null;
+                }
+                String parse = response.getBody();
+                ActorWithTvShows actorWithTvShows = new ObjectMapper().readValue(parse, ActorWithTvShows.class);
+                tvShows.addAll(actorWithTvShows.getCast());//List<Object> currentActor = new ArrayList<>(actorWithTvShows.getCast());
+            } catch (URISyntaxException e) {
+                log.error("Couldn't get uri TvShow", e);
+            }  catch (JsonProcessingException e) {
+                log.error("Couldn't get json TvShow", e);
+            }
+
+        }
+        ArrayList<TvShow> tvShowsCutWatchedList = new ArrayList<>(tvShows);
+        if (user.getWatchedTvShows() != null){
+            HashMap<String, Integer> watchedTvShowMap = user.getWatchedTvShows();
+            List<TvShow> removeList = tvShows.stream().filter(tvShowFilter -> watchedTvShowMap.containsKey(tvShowFilter.getName()))
+                    .collect(Collectors.toList());
+            tvShowsCutWatchedList.removeAll(removeList);
+        }
+
+        return tvShowsCutWatchedList;
     }
 
     private String getTmdbUrl(String tmdbItem) throws URISyntaxException {
