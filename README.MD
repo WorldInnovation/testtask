@@ -5,3 +5,6 @@ For start app:
 
 4. http://localhost:8080/user
 5. curl -X POST --data "email=test@test2.com&password=test" http://localhost:8080/user/register/ -v -u user:password
+
+6. Add favorite Actor
+curl -X POST --data "email=test@test2.com&password=test&name=Jennifer&lastName=Connelly" http://localhost:8080/tv/addActor/ -u user:password
