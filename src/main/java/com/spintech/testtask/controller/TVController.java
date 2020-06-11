@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 @RequestMapping("/tv")
@@ -42,7 +42,6 @@ public class TVController {
 
         User user = userService.findUser(email, password);
         if (fullName.equals(NAME_SEPARATOR) || Objects.isNull(user)) {
-            //throw new PersonNotFoundException(fullName);
              return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(fullName);
         }
         Person person = tmdbApi.findPerson(fullName);
@@ -103,4 +102,15 @@ public class TVController {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(tvShowName);
     }
 
+    @RequestMapping(value = "/tvFavoriteActorUnwatched", method = RequestMethod.GET)
+    public List<TvShow> tvFavoriteActorUnwatched(@RequestParam(required = false, defaultValue = "test@test2.com") String email,
+                                                 @RequestParam(required = false, defaultValue = "test") String password) {
+
+        List<TvShow> tvShows = new ArrayList<>();
+        User user = userService.findUser(email, password);
+        if ( Objects.isNull(user) || user.getFavoriteActors().isEmpty() ) {
+            return tvShows;
+        }
+        return tmdbApi.finedTvFavoriteActorUnwatched(user);
+    }
 }

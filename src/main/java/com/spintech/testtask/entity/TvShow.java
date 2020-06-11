@@ -33,6 +33,12 @@ public class TvShow {
     private String overview;
     ArrayList<Object> origin_country = new ArrayList<>();
 
+    public TvShow(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+
     public int getId() {
         return id;
     }
