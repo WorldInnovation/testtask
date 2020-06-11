@@ -1,6 +1,7 @@
 package com.spintech.testtask.service.impl;
 
 import com.spintech.testtask.entity.Person;
+import com.spintech.testtask.entity.TvShow;
 import com.spintech.testtask.entity.User;
 import com.spintech.testtask.repository.UserRepository;
 import com.spintech.testtask.service.UserService;
@@ -62,6 +63,17 @@ public class UserServiceImpl implements UserService {
             user.setFavoriteActors(favoriteActorsMap);
             userRepository.save(user);
         }
+        return user;
+    }
+
+    @Override
+    public User addTvShowWatched(User user, TvShow tvShow) {
+        HashMap<String, Integer> watchedTvShows = (user.getWatchedTvShows() == null)
+                ? new HashMap<>()
+                : new HashMap<>(user.getWatchedTvShows());
+        watchedTvShows.put(tvShow.getName(), tvShow.getId());
+        user.setWatchedTvShows(watchedTvShows);
+        userRepository.save(user);
         return user;
     }
 }

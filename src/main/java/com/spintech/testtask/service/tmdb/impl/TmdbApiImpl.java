@@ -3,6 +3,7 @@ package com.spintech.testtask.service.tmdb.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spintech.testtask.entity.Person;
+import com.spintech.testtask.entity.TvShow;
 import com.spintech.testtask.service.tmdb.TmdbApi;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.utils.URIBuilder;
@@ -30,6 +31,8 @@ public class TmdbApiImpl implements TmdbApi {
     private String tmdbSearch;
     @Value("${tmdb.person}")
     private String tmdbPerson;
+    @Value("${tmdb.tv}")
+    private String tmdbTv;
 
     @Override
     public Person findPerson(String fullName) {
@@ -59,6 +62,28 @@ public class TmdbApiImpl implements TmdbApi {
         URIBuilder uriBuilder = getUriBuilder(builder.toString());
         uriBuilder.addParameter("query", query);
         return uriBuilder.build().toString();
+    }
+
+    @Override
+    public TvShow findTvShow(String tvShowName)  {
+        try {
+            String url = getSearchUrl(tmdbTv, tvShowName);
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                return null;
+            }
+
+            String parse = cutResultsFromResponce(response.getBody());
+            return new ObjectMapper().readValue(parse, TvShow.class);
+        } catch (URISyntaxException e) {
+            log.error("Couldn't get uri for TvShow", e);
+        } catch (JsonProcessingException e) {
+            log.error("Couldn't get json TvShow", e);
+        }
+
+        return null;
     }
 
     private String getTmdbUrl(String tmdbItem) throws URISyntaxException {

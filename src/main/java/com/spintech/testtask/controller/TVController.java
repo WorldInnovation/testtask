@@ -1,10 +1,13 @@
 package com.spintech.testtask.controller;
 
 import com.spintech.testtask.entity.Person;
+import com.spintech.testtask.entity.TvShow;
 import com.spintech.testtask.entity.User;
 import com.spintech.testtask.error.PersonNotFoundException;
+import com.spintech.testtask.error.TvShowNotFoundException;
 import com.spintech.testtask.service.UserService;
 import com.spintech.testtask.service.tmdb.TmdbApi;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Objects;
+
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 @RequestMapping("/tv")
@@ -37,7 +42,8 @@ public class TVController {
 
         User user = userService.findUser(email, password);
         if (fullName.equals(NAME_SEPARATOR) || Objects.isNull(user)) {
-            throw new PersonNotFoundException(fullName);
+            //throw new PersonNotFoundException(fullName);
+             return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(fullName);
         }
         Person person = tmdbApi.findPerson(fullName);
 
@@ -61,6 +67,24 @@ public class TVController {
         }
         userService.removeFavoriteActor(user, fullName);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(fullName);
+    }
+
+    @RequestMapping(value = "/addWatchedTv", method = RequestMethod.POST)
+    public ResponseEntity addWatchedTv(@RequestParam String email,
+                                       @RequestParam String password,
+                                       @RequestParam String tvShowName) {
+
+        User user = userService.findUser(email, password);
+        if (Objects.isNull(user) || Strings.isBlank(tvShowName)) {
+            throw new TvShowNotFoundException(tvShowName);
+        }
+        TvShow tvShow = tmdbApi.findTvShow(tvShowName);
+
+        if (Objects.nonNull(tvShow)){
+            userService.addTvShowWatched(user, tvShow);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(tvShow);
     }
 
 }

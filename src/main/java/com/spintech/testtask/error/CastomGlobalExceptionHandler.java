@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class CastomGlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(PersonNotFoundException.class)
+    @ExceptionHandler({PersonNotFoundException.class, TvShowNotFoundException.class})
     public void SpringHandlerNotFound(HttpServletResponse response) throws IOException {
         response.sendError(HttpStatus.NOT_FOUND.value());
     }
