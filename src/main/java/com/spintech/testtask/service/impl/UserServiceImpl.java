@@ -51,4 +51,17 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         return user;
     }
+
+    @Override
+    public User removeFavoriteActor(User user,String fullName) {
+        HashMap<String, Integer> favoriteActorsMap = (user.getFavoriteActors() == null)
+                ? new HashMap<>()
+                : new HashMap<>(user.getFavoriteActors());
+        if (favoriteActorsMap.containsKey(fullName)){
+            favoriteActorsMap.remove(fullName);
+            user.setFavoriteActors(favoriteActorsMap);
+            userRepository.save(user);
+        }
+        return user;
+    }
 }

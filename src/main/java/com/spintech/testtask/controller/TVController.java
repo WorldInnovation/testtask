@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Objects;
 
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
-
 @RestController
 @RequestMapping("/tv")
 public class TVController {
@@ -46,8 +44,23 @@ public class TVController {
         if (Objects.nonNull(person)){
             userService.addFavoriteActor(user, person);
         }
-
+        userService.addFavoriteActor(user, person);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(person);
+    }
+
+    @RequestMapping(value = "/removeActor", method = RequestMethod.POST)
+    public ResponseEntity removeFavoriteActor(@RequestParam String email,
+                                              @RequestParam String password,
+                                              @RequestParam String name,
+                                              @RequestParam String lastName){
+
+        String fullName = name.concat(NAME_SEPARATOR).concat(lastName);
+        User user = userService.findUser(email, password);
+        if (fullName.equals(NAME_SEPARATOR)|| Objects.isNull(user)) {
+            throw new PersonNotFoundException(fullName);
+        }
+        userService.removeFavoriteActor(user, fullName);
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(fullName);
     }
 
 }

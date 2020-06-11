@@ -8,3 +8,5 @@ For start app:
 
 6. Add favorite Actor
 curl -X POST --data "email=test@test2.com&password=test&name=Jennifer&lastName=Connelly" http://localhost:8080/tv/addActor/ -u user:password
+7. Remove favorite actor
+curl -X POST --data "email=test@test2.com&password=test&name=Jennifer&lastName=Connelly" http://localhost:8080/tv/removeActor/ -u user:password
