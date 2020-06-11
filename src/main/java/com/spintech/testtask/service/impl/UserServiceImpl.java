@@ -76,4 +76,17 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         return user;
     }
+
+    @Override
+    public User unSelectTvShowWatched(User user, TvShow tvShow) {
+        HashMap<String, Integer> watchedTvShows = (user.getWatchedTvShows() == null)
+                ? new HashMap<>()
+                : new HashMap<>(user.getWatchedTvShows());
+        if (watchedTvShows.containsKey(tvShow.getName())) {
+            watchedTvShows.remove(tvShow.getName());
+            user.setWatchedTvShows(watchedTvShows);
+            userRepository.save(user);
+        }
+        return user;
+    }
 }
