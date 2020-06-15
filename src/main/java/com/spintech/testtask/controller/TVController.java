@@ -42,7 +42,7 @@ public class TVController {
 
         User user = userService.findUser(email, password);
         if (fullName.equals(NAME_SEPARATOR) || Objects.isNull(user)) {
-             return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(fullName);
+             throw new PersonNotFoundException(fullName);
         }
         Person person = tmdbApi.findPerson(fullName);
 
